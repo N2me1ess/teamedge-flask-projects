@@ -37,6 +37,11 @@ def violet():
     color = 'violet'
     return render_template('index.html', color = color)
 
+@app.route('/rainbow')
+def rainbow():
+    color_links = ["red", "blue", "green", "orange", "yellow", "indigo", "violet"]
+    return render_template("rainbow.html", color_links = color_links)
+
 
 
 if __name__ == '__main__':
