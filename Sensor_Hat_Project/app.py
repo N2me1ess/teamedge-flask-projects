@@ -27,15 +27,12 @@ def text():
 @app.route('/text_recieved',methods = ['POST', 'GET']) # Goes to this site to do something with text
 def text_recieved():
    if request.method == 'POST':
-      user = request.form['tx']
-      return redirect(url_for('text_sent',text = user))
-   else:
-      user = request.args.get('tx')
-      return redirect(url_for('text_sent',text = user))
+      text = request.form['text']
+      return redirect(url_for('text_sent',text = text))
 
 @app.route("/text_sent/<text>")
 def text_sent(text): # Text variable needs to be send to raspimon, 
-    return render_template("text_sent")
+    return "<p> Your message '%s' shall now display on your sensor hat </p>" % text
 
 if __name__ == '__main__':
    app.run(debug = True)
