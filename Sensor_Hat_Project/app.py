@@ -1,5 +1,8 @@
 from flask import Flask,render_template, redirect, url_for, request
+from sense_hat import SenseHat 
 app = Flask(__name__)
+sense = SenseHat()
+
 
 @app.route("/")
 def home_page():
@@ -26,13 +29,10 @@ def text():
 
 @app.route('/text_recieved',methods = ['POST', 'GET']) # Goes to this site to do something with text
 def text_recieved():
-   if request.method == 'POST':
       text = request.form['text']
-      return redirect(url_for('text_sent',text = text))
+      sense.show_message(text)
+      return render_template("text_sent.html", text = text)
 
-@app.route("/text_sent/<text>")
-def text_sent(text): # Text variable needs to be send to raspimon, 
-    return "<p> Your message '%s' shall now display on your sensor hat </p>" % text
 
 if __name__ == '__main__':
    app.run(debug = True)
