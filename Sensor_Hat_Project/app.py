@@ -1,8 +1,9 @@
 from flask import Flask,render_template, redirect, url_for, request
 from sense_hat import SenseHat 
+import sqlite3
 app = Flask(__name__)
 sense = SenseHat()
-
+name = "yikers"
 
 @app.route("/")
 def home_page():
@@ -12,26 +13,29 @@ def home_page():
 def login():
    if request.method == 'POST':
       user = request.form['nm']
-      return redirect(url_for('success',name = user))
+      return redirect(url_for('text',name = user))
    else:
       user = request.args.get('nm')
-      return redirect(url_for('success',name = user))
-
-@app.route('/success/<name>')
-def success(name):
-   return "<p> Welcome %s to Cristian's Sensorhat.</p> <p>Go to /text to have text displayed on your Sensor Hat. Or use /display to edit your raspimon </p>" % name  
+      return redirect(url_for('text',name = user)) 
 
 # Break this so I dont get brain cancer
 
-@app.route("/text") # Renders text html with /text
-def text():
-    return render_template("text.html")
+@app.route("/text/<name>") # Renders text html with /text
+def text(name):
+   return render_template("text.html", name = name)
 
-@app.route('/text_recieved',methods = ['POST', 'GET']) # Goes to this site to do something with text
+@app.route('/text_recieved',methods = ['POST']) # Goes to this site to do something with text
 def text_recieved():
-      text = request.form['text']
-      sense.show_message(text)
-      return render_template("text_sent.html", text = text)
+      message = request.form['text']
+      conn = sqlite3.connect('./static/data/senseDisplay.db')
+      curs = conn.cursor()
+      curs.execute("INSERT INTO messages (name, message) VALUES((?), (?))",(name, message))
+
+      conn.commit()
+      conn.close()
+
+      sense.show_message(message)
+      return render_template("text_sent.html", message = message)
 
 
 if __name__ == '__main__':
